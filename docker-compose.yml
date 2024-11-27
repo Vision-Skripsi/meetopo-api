@@ -1,0 +1,29 @@
+---
+services:
+  laravelapp:
+    container_name: laravelapp
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+  
+  db:
+    container_name: db
+    image: postgres:13.3-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: meetopo
+      POSTGRES_PASSWORD: meetopo
+      POSTGRES_DB: meetopo
+    volumes:
+      - laravel_app_volume:/var/lib/postgres/data
+
+volumes:
+  laravel_app_volume:
+    name: laravel_app_volume
