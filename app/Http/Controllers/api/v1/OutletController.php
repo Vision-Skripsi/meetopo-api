@@ -37,6 +37,8 @@ class OutletController extends Controller
             'phone_two' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
             'photo' => 'nullable|image|max:2048', // Adjust validation as needed
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
 
         if ($validator->fails()) {

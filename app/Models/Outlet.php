@@ -23,7 +23,9 @@ class Outlet extends Model
         'phone_two',
         'email',
         'photo',
-        'user_id', 
+        'latitude',
+        'longitude',
+        'user_id',
     ];
 
     /**
@@ -34,6 +36,8 @@ class Outlet extends Model
     protected $casts = [
         'id' => 'string', // Ensure UUID is treated as a string
         'user_id' => 'string', // Ensure UUID is treated as a string
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
     /**
