@@ -16,6 +16,7 @@ class MenusController extends Controller
         
         // Validate incoming payload
         $validated = $request->validate([
+            '*.id' => 'required|uuid',
             '*.outlet_id' => 'required|uuid',  // Ensure outlet_id is a valid UUID
             '*.name' => 'required|string|max:255',
             '*.image' => 'nullable|string',
@@ -24,16 +25,29 @@ class MenusController extends Controller
         ]);
 
         try {
-            // Perform bulk insertion
-            Menus::insert($validated);
-
+            foreach ($validated as $menu) {
+                Menus::updateOrCreate(
+                    [
+                        'id' => $menu['id'],
+                        'outlet_id' => $menu['outlet_id'],
+                    ],
+                    [
+                        'name' => $menu['name'],
+                        'image' => $menu['image'] ?? null,
+                        'price' => $menu['price'],
+                        'category' => $menu['category'],
+                        'updated_at' => now()
+                    ]
+                );
+            }
+    
             return response()->json([
-                'message' => 'Menus inserted successfully.',
+                'message' => 'Menus inserted or updated successfully.',
                 'data' => $validated,
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'An error occurred while inserting menus.',
+                'message' => 'An error occurred while inserting/updating menus.',
                 'error' => $e->getMessage(),
             ], 500);
         }
@@ -55,6 +69,22 @@ class MenusController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while fetching menus.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy(Menus $menu)
+    {
+        try {
+            $menu->delete();
+    
+            return response()->json([
+                'message' => 'Menu deleted successfully.',
+            ], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while deleting the menu.',
                 'error' => $e->getMessage(),
             ], 500);
         }

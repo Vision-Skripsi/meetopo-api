@@ -22,6 +22,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
     Route::middleware('userAccess:cashier')->group(function () {
         Route::apiResource('outlets', OutletController::class);    
         Route::post('/menus/bulk-insert', [MenusController::class, 'bulkInsert']);
+        Route::delete('/menus/{menu}', [MenusController::class, 'destroy']);
     });
 
     Route::get('auth/user', [AuthenticationController::class, 'getUserData']);

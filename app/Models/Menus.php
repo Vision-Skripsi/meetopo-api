@@ -44,6 +44,7 @@ class Menus extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'outlet_id',
         'name',
         'image',
