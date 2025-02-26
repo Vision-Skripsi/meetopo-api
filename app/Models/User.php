@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -57,5 +58,10 @@ class User extends Authenticatable
     public function outlet(): HasOne
     {
         return $this->hasOne(Outlet::class);
+    }
+
+    public function details(): HasOne
+    {
+        return $this->hasOne(UserDetails::class);
     }
 }
