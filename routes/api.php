@@ -6,6 +6,7 @@ use App\Http\Controllers\api\v1\AuthenticationController;
 use App\Http\Controllers\api\v1\UserDetailsController;
 use App\Http\Controllers\api\v1\OutletController;
 use App\Http\Controllers\api\v1\MenusController;
+use App\Http\Controllers\api\v1\TransactionController;
 
 
 Route::prefix('v1')->group(function(){
@@ -32,4 +33,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
     });
 
     Route::get('auth/user', [AuthenticationController::class, 'getUserData']);
+});
+
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+    Route::middleware('userAccess:cashier')->group(function () {
+        Route::post('/transactions/bulk-insert', [TransactionController::class, 'bulkInsert']);
+    });
+
+    Route::get('/transactions/{outlet_id}', [TransactionController::class, 'getTransactionsByOutletId']);
 });
