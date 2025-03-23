@@ -7,7 +7,7 @@ use App\Http\Controllers\api\v1\UserDetailsController;
 use App\Http\Controllers\api\v1\OutletController;
 use App\Http\Controllers\api\v1\MenusController;
 use App\Http\Controllers\api\v1\TransactionController;
-
+use App\Http\Controllers\api\v1\TablesController;
 
 Route::prefix('v1')->group(function(){
     Route::get('auth/missing-token', [AuthenticationController::class, 'missingToken'])->name('login');
@@ -41,4 +41,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     });
 
     Route::get('/transactions/{outlet_id}', [TransactionController::class, 'getTransactionsByOutletId']);
+});
+
+Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
+    Route::middleware('userAccess:cashier')->group(function () {
+        Route::post('/tables/bulk-insert', [TablesController::class, 'bulkInsert']);
+    });
+
+    Route::get('/tables/{outlet_id}', [TablesController::class, 'getTablesByOutletId']);
 });
