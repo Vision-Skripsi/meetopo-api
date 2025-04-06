@@ -39,7 +39,6 @@ class UserDetailsController extends Controller
             'name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
-            'id_card' => 'nullable|string|max:50',
             'photo' => 'nullable|string|max:2048',
         ]);
 
@@ -52,7 +51,6 @@ class UserDetailsController extends Controller
             [
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'id_card' => $request->id_card,
                 'photo' => $request->photo,
             ]
         );

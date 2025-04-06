@@ -64,4 +64,13 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserDetails::class);
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->id = $model->id ?? Str::uuid()->toString();
+        });
+    }
 }

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use App\Models\UserDetails;
+use Illuminate\Support\Str;
 
 class AuthenticationController extends Controller
 {
@@ -36,6 +38,16 @@ class AuthenticationController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $role,
+        ]);
+
+        $idCard = str_pad(strval(random_int(0, 9999999999999999)), 16, '0', STR_PAD_LEFT);
+
+        UserDetails::create([
+            'user_id' => $user->id,
+            'id_card' => $idCard,
+            'phone' => '',
+            'address' => '',
+            'photo' => '',
         ]);
 
         // Return a successful response with the created user data
