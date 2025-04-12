@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Menus;
+use Illuminate\Support\Facades\Storage;
 
 class MenusController extends Controller
 {
@@ -13,19 +14,43 @@ class MenusController extends Controller
      */
     public function bulkInsert(Request $request)
     {
-        
-        // Validate incoming payload
         $validated = $request->validate([
-            '*.id' => 'required|uuid',
-            '*.outlet_id' => 'required|uuid',  // Ensure outlet_id is a valid UUID
-            '*.name' => 'required|string|max:255',
-            '*.image' => 'nullable|string',
-            '*.price' => 'required|numeric', // Adjust validation based on your price format
-            '*.category' => 'required|string|max:255',
+            'menus' => 'required|array',
+            'menus.*.id' => 'required|uuid',
+            'menus.*.outlet_id' => 'required|uuid',
+            'menus.*.name' => 'required|string|max:255',
+            'menus.*.price' => 'required|numeric',
+            'menus.*.category' => 'required|string|max:255',
+            'menus.*.image' => 'nullable|string',
         ]);
 
         try {
-            foreach ($validated as $menu) {
+            $responseMenus = [];
+
+            foreach ($validated['menus'] as $index => $menu) {
+                $imageKey = "image_$index";
+                $imageUrl = $menu['image'] ?? null;
+
+                $existingMenu = Menus::where('id', $menu['id'])
+                    ->where('outlet_id', $menu['outlet_id'])
+                    ->first();
+
+                if ($request->hasFile($imageKey)) {
+                    if ($existingMenu && $existingMenu->image && str_contains($existingMenu->image, 'amazonaws.com')) {
+                        $oldPath = parse_url($existingMenu->image, PHP_URL_PATH);
+                        $oldKey = ltrim($oldPath, '/');
+                        Storage::disk('s3')->delete($oldKey);
+                    }
+
+                    $file = $request->file($imageKey);
+                    $path = $file->store('menus', 's3');
+                    Storage::disk('s3')->setVisibility($path, 'public');
+
+                    /** @var \Illuminate\Filesystem\FilesystemAdapter $s3 */
+                    $s3 = Storage::disk('s3');
+                    $imageUrl = $s3->url($path);
+                }
+
                 Menus::updateOrCreate(
                     [
                         'id' => $menu['id'],
@@ -33,17 +58,26 @@ class MenusController extends Controller
                     ],
                     [
                         'name' => $menu['name'],
-                        'image' => $menu['image'] ?? null,
+                        'image' => $imageUrl,
                         'price' => $menu['price'],
                         'category' => $menu['category'],
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]
                 );
             }
-    
+
+            $responseMenus[] = [
+                'id' => $menu['id'],
+                'outlet_id' => $menu['outlet_id'],
+                'name' => $menu['name'],
+                'price' => $menu['price'],
+                'category' => $menu['category'],
+                'image' => $imageUrl,
+            ];
+
             return response()->json([
                 'message' => 'Menus inserted or updated successfully.',
-                'data' => $validated,
+                'data' => $responseMenus,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

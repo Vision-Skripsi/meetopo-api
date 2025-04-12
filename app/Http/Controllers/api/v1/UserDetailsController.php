@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\UserDetails;
+use Illuminate\Support\Facades\Storage;
 
 class UserDetailsController extends Controller
 {
@@ -39,11 +40,31 @@ class UserDetailsController extends Controller
             'name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
-            'photo' => 'nullable|string|max:2048',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $details = UserDetails::where('user_id', $user_id)->first();
+
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $s3 */
+        $s3 = Storage::disk('s3');
+        $photoUrl = $details->photo ?? null;
+    
+        if ($request->hasFile('photo')) {
+            if ($photoUrl) {
+                $oldPath = parse_url($photoUrl, PHP_URL_PATH);
+                $oldKey = ltrim($oldPath, '/');
+                if ($s3->exists($oldKey)) {
+                    $s3->delete($oldKey);
+                }
+            }
+    
+            $photoPath = $request->file('photo')->store('users', 's3');
+            $s3->setVisibility($photoPath, 'public');
+            $photoUrl = $s3->url($photoPath);
         }
 
         $details = UserDetails::updateOrCreate(
@@ -51,7 +72,7 @@ class UserDetailsController extends Controller
             [
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'photo' => $request->photo,
+                'photo' => $photoUrl,
             ]
         );
 
