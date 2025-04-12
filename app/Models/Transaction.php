@@ -20,7 +20,8 @@ class Transaction extends Model
         'user_id',
         'outlet_id',
         'table_id',
-        'is_closed'
+        'is_closed',
+        'created_at'
     ];
 
     protected $casts = [

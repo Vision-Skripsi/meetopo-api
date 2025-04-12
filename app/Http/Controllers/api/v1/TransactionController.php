@@ -18,6 +18,7 @@ class TransactionController extends Controller
             '*.outlet_id' => 'required|uuid',
             '*.table_id' => 'required|uuid',
             '*.is_closed' => 'required|boolean',
+            '*.created_at' => 'nullable|date',
             '*.items' => 'required|array',
             '*.items.*.id' => 'required|uuid',
             '*.items.*.menu_id' => 'required|uuid',
@@ -37,6 +38,7 @@ class TransactionController extends Controller
                         'user_id' => $transactionData['user_id'],
                         'table_id' => $transactionData['table_id'],
                         'is_closed' => $transactionData['is_closed'],
+                        'created_at' => $transactionData['created_at']
                     ]
                 );
 
