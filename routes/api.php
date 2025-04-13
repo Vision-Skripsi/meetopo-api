@@ -46,6 +46,8 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
     Route::middleware('userAccess:cashier')->group(function () {
         Route::post('/tables/bulk-insert', [TablesController::class, 'bulkInsert']);
+        Route::post('/tables/lock/{id}', [TablesController::class, 'lockTable']);
+        Route::post('/tables/unlock/{id}', [TablesController::class, 'unlockTable']);
     });
 
     Route::get('/tables/{outlet_id}', [TablesController::class, 'getTablesByOutletId']);
