@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\UserDetails;
-use Illuminate\Support\Str;
 
 class AuthenticationController extends Controller
 {
@@ -23,14 +22,14 @@ class AuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'nullable|in:cashier,customer',
+            'role' => 'required|in:Owner,Cashier,Customer',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $role = $request->role ?? 'customer';
+        $role = $request->role ?? 'Customer';
 
         // Create the new user
         $user = User::create([

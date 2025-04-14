@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Table;
-use Illuminate\Support\Str;
 
 class TablesController extends Controller
 {
@@ -67,13 +66,7 @@ class TablesController extends Controller
                     'locked_by' => $table->locked_by,
                 ];
             });
-
-            if ($tables->isEmpty()) {
-                return response()->json([
-                    'message' => 'No tables found for the given outlet ID.',
-                ], 404);
-            }
-
+            
             return response()->json($tables, 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -138,6 +131,30 @@ class TablesController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to unlock the table.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $table = Table::find($id);
+
+            if (!$table) {
+                return response()->json([
+                    'message' => 'Table not found, nothing to delete.',
+                ], 204);
+            }
+
+            $table->delete();
+
+            return response()->json([
+                'message' => 'Table deleted successfully.',
+            ], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while deleting the table.',
                 'error' => $e->getMessage(),
             ], 500);
         }

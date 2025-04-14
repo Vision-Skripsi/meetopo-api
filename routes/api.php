@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\AuthenticationController;
 use App\Http\Controllers\api\v1\UserDetailsController;
@@ -13,42 +12,49 @@ Route::prefix('v1')->group(function(){
     Route::get('auth/missing-token', [AuthenticationController::class, 'missingToken'])->name('login');
     Route::post('auth/user/registration', [AuthenticationController::class, 'registration']);
     Route::post('auth/user/login', [AuthenticationController::class, 'login']);
+    Route::get('/outlets-public', [OutletController::class, 'index']);
 });
 
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+    Route::get('auth/user', [AuthenticationController::class, 'getUserData']);
     Route::get('user/details/{user_id}', [UserDetailsController::class, 'show']);
     Route::put('user/details/{user_id}', [UserDetailsController::class, 'update']);
-});
 
-Route::prefix('v1')->group(function(){
-    Route::apiResource('outlets-public', OutletController::class);
-    Route::get('/menus/{outlet_id}', [MenusController::class, 'getMenusByOutletId']);
-});
-
-Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
-    Route::middleware('userAccess:cashier')->group(function () {
-        Route::apiResource('outlets', OutletController::class);    
-        Route::post('/menus/bulk-insert', [MenusController::class, 'bulkInsert']);
-        Route::delete('/menus/{menu}', [MenusController::class, 'destroy']);
+    // === OUTLETS ===
+    Route::middleware('userAccess:Owner')->group(function () {
+        Route::apiResource('outlets', OutletController::class);
     });
 
-    Route::get('auth/user', [AuthenticationController::class, 'getUserData']);
-});
+    Route::middleware('userAccess:Owner, Cashier')->group(function () {
+        Route::get('/outlets', [OutletController::class, 'index']);
+    });
 
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
-    Route::middleware('userAccess:cashier')->group(function () {
+    // === MENUS ===
+    Route::get('/menus/{outlet_id}', [MenusController::class, 'getMenusByOutletId']);
+
+    Route::middleware('userAccess:Owner')->group(function () {
+        Route::post('/menus/bulk-insert', [MenusController::class, 'bulkInsert']);
+        Route::delete('/menus/{id}', [MenusController::class, 'destroy']);
+    });
+
+    // === TRANSACTIONS ===
+    Route::middleware('userAccess:Owner')->group(function () {
+        Route::get('/transactions/{outlet_id}', [TransactionController::class, 'getTransactionsByOutletId']);
+    });
+    
+    Route::middleware('userAccess:Owner,Cashier')->group(function () {
         Route::post('/transactions/bulk-insert', [TransactionController::class, 'bulkInsert']);
     });
 
-    Route::get('/transactions/{outlet_id}', [TransactionController::class, 'getTransactionsByOutletId']);
-});
-
-Route::prefix('v1')->middleware('auth:sanctum')->group(function(){
-    Route::middleware('userAccess:cashier')->group(function () {
+    // === TABLES ===
+    Route::middleware('userAccess:Owner')->group(function () {
         Route::post('/tables/bulk-insert', [TablesController::class, 'bulkInsert']);
+        Route::delete('/tables/{id}', [TablesController::class, 'destroy']);
+    });
+
+    Route::middleware('userAccess:Owner,Cashier')->group(function () {
+        Route::get('/tables/{outlet_id}', [TablesController::class, 'getTablesByOutletId']);
         Route::post('/tables/lock/{id}', [TablesController::class, 'lockTable']);
         Route::post('/tables/unlock/{id}', [TablesController::class, 'unlockTable']);
     });
-
-    Route::get('/tables/{outlet_id}', [TablesController::class, 'getTablesByOutletId']);
 });
