@@ -164,7 +164,7 @@ class OutletController extends Controller
         if ($cashierId) {
             $cashier = User::where('id', $cashierId)
                         ->where('created_by', $ownerId)
-                        ->where('role', 'Cashier')
+                        ->where('role', 'Kasir')
                         ->first();
 
             if (!$cashier) {

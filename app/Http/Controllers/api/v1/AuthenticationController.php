@@ -22,14 +22,14 @@ class AuthenticationController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:Owner,Cashier,Customer',
+            'role' => 'required|in:Pemilik,Kasir,Pelanggan',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $role = $request->role ?? 'Customer';
+        $role = $request->role ?? 'Pelanggan';
 
         // Create the new user
         $user = User::create([
@@ -76,7 +76,7 @@ class AuthenticationController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        if ($user->role === 'Cashier') {
+        if ($user->role === 'Kasir') {
             if (!$user->outlet) {
                 return response()->json(['message' => 'Your account has not been assigned to an outlet.'], 403);
             }
@@ -102,7 +102,7 @@ class AuthenticationController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        if ($user->role === 'Cashier') {
+        if ($user->role === 'Kasir') {
             $user->load('outlet');
         }
         
@@ -126,7 +126,7 @@ class AuthenticationController extends Controller
         $ownerId = Auth::id();
 
         $cashiers = User::where('created_by', $ownerId)
-                        ->where('role', 'Cashier')
+                        ->where('role', 'Kasir')
                         ->with('details')
                         ->get();
 
@@ -145,7 +145,7 @@ class AuthenticationController extends Controller
         }
 
         $owner = Auth::user();
-        if (!$owner || $owner->role !== 'Owner') {
+        if (!$owner || $owner->role !== 'Pemilik') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -153,7 +153,7 @@ class AuthenticationController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'Cashier',
+            'role' => 'Kasir',
             'created_by' => $owner->id,
         ]);
 
@@ -176,7 +176,7 @@ class AuthenticationController extends Controller
 
         $cashier = User::where('id', $id)
                     ->where('created_by', $ownerId)
-                    ->where('role', 'Cashier')
+                    ->where('role', 'Kasir')
                     ->first();
 
         if (!$cashier) {

@@ -20,7 +20,7 @@ class MenusController extends Controller
             'menus.*.outlet_id' => 'required|uuid',
             'menus.*.name' => 'required|string|max:255',
             'menus.*.price' => 'required|numeric',
-            'menus.*.category' => 'required|string|max:255',
+            'menus.*.category' => 'required|in:Appetizer,Dessert,Drinks,Food,Vegetarian',
             'menus.*.image' => 'nullable|string',
         ]);
 
