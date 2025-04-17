@@ -29,7 +29,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'created_by'
     ];
 
     /**
@@ -57,7 +58,7 @@ class User extends Authenticatable
 
     public function outlet(): HasOne
     {
-        return $this->hasOne(Outlet::class);
+        return $this->hasOne(Outlet::class, 'cashier_id');
     }
 
     public function details(): HasOne

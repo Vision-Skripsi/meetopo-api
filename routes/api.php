@@ -20,9 +20,17 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('user/details/{user_id}', [UserDetailsController::class, 'show']);
     Route::put('user/details/{user_id}', [UserDetailsController::class, 'update']);
 
+    // === USERS - Cashier ===
+    Route::middleware('userAccess:Owner')->group(function () {
+        Route::get('/cashiers', [AuthenticationController::class, 'getCashiers']);
+        Route::post('auth/user/create-cashier', [AuthenticationController::class, 'createCashier']);
+        Route::delete('/cashier/{id}', [AuthenticationController::class, 'deleteCashier']);
+    });
+
     // === OUTLETS ===
     Route::middleware('userAccess:Owner')->group(function () {
         Route::apiResource('outlets', OutletController::class);
+        Route::post('/outlets/assign-cashier/{outlet_id}', [OutletController::class, 'assignCashier']);
     });
 
     Route::middleware('userAccess:Owner, Cashier')->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Outlet; // Assuming you have an Outlet model
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Auth;
 use Illuminate\Support\Facades\Storage;
@@ -139,5 +140,45 @@ class OutletController extends Controller
     {
         $outlet->delete();
         return response()->json(null, 204);
+    }
+
+    public function assignCashier(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'cashier_id' => 'nullable|uuid|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $ownerId = auth()->user()->id;
+        $outlet = Outlet::findOrFail($id);
+
+        if ($outlet->user_id !== $ownerId) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $cashierId = $request->cashier_id;
+
+        if ($cashierId) {
+            $cashier = User::where('id', $cashierId)
+                        ->where('created_by', $ownerId)
+                        ->where('role', 'Cashier')
+                        ->first();
+
+            if (!$cashier) {
+                return response()->json(['message' => 'Cashier not found or unauthorized'], 404);
+            }
+        }
+
+        $outlet->cashier_id = $cashierId;
+        $outlet->save();
+
+        return response()->json([
+            'message' => $cashierId 
+                ? 'Cashier assigned successfully.' 
+                : 'Cashier removed from outlet.',
+        ]);
     }
 }
