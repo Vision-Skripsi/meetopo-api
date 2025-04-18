@@ -20,7 +20,7 @@ class MenusController extends Controller
             'menus.*.outlet_id' => 'required|uuid',
             'menus.*.name' => 'required|string|max:255',
             'menus.*.price' => 'required|numeric',
-            'menus.*.category' => 'required|string|max:255',
+            'menus.*.category' => 'required|in:Appetizer,Dessert,Drinks,Food,Vegetarian',
             'menus.*.image' => 'nullable|string',
         ]);
 
@@ -108,11 +108,25 @@ class MenusController extends Controller
         }
     }
 
-    public function destroy(Menus $menu)
+    public function destroy($id)
     {
         try {
+            $menu = Menus::find($id);
+
+            if (!$menu) {
+                return response()->json([
+                    'message' => 'Menu not found, nothing to delete.',
+                ], 204);
+            }
+
+            if ($menu->image && str_contains($menu->image, 'amazonaws.com')) {
+                $oldPath = parse_url($menu->image, PHP_URL_PATH);
+                $oldKey = ltrim($oldPath, '/');
+                Storage::disk('s3')->delete($oldKey);
+            }
+
             $menu->delete();
-    
+
             return response()->json([
                 'message' => 'Menu deleted successfully.',
             ], 204);

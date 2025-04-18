@@ -32,4 +32,9 @@ class Table extends Model
     {
         return $this->belongsTo(Outlet::class, 'outlet_id');
     }
+
+    public function lockedBy()
+    {
+        return $this->belongsTo(User::class, 'locked_by');
+    }
 }

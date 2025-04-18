@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('price');
-            $table->string('category');
+            $table->enum('category', ['Appetizer', 'Dessert', 'Drinks', 'Food', 'Vegetarian'])->default('Food');
             $table->timestamps();
             $table->softDeletes(); 
         });

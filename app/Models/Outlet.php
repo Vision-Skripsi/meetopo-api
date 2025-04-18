@@ -26,6 +26,7 @@ class Outlet extends Model
         'latitude',
         'longitude',
         'user_id',
+        'cashier_id',
     ];
 
     /**
@@ -36,6 +37,7 @@ class Outlet extends Model
     protected $casts = [
         'id' => 'string', // Ensure UUID is treated as a string
         'user_id' => 'string', // Ensure UUID is treated as a string
+        'cashier_id' => 'string', // Ensure UUID is treated as a string
         'latitude' => 'float',
         'longitude' => 'float',
     ];
@@ -45,6 +47,6 @@ class Outlet extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'cashier_id');
     }
 }

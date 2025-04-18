@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['Pemilik', 'Kasir', 'Pelanggan'])->default('Pelanggan')->after('password');;
+        Schema::table('outlets', function (Blueprint $table) {
+            $table->uuid('cashier_id')->nullable()->unique();
+
+            $table->foreign('cashier_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
         });
     }
 
@@ -21,8 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+        Schema::table('outlets', function (Blueprint $table) {
+            //
         });
     }
 };

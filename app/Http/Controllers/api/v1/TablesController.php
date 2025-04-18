@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Table;
-use Illuminate\Support\Str;
 
 class TablesController extends Controller
 {
@@ -55,18 +54,107 @@ class TablesController extends Controller
     public function getTablesByOutletId($outlet_id)
     {
         try {
-            $tables = Table::where('outlet_id', $outlet_id)->get();
-
-            if ($tables->isEmpty()) {
-                return response()->json([
-                    'message' => 'No tables found for the given outlet ID.',
-                ], 404);
-            }
-
+            $tables = Table::where('outlet_id', $outlet_id)->get()->map(function ($table) {
+                return [
+                    'id' => $table->id,
+                    'outlet_id' => $table->outlet_id,
+                    'number' => $table->number,
+                    'is_available' => $table->is_available,
+                    'created_at' => $table->created_at,
+                    'updated_at' => $table->updated_at,
+                    'deleted_at' => $table->deleted_at,
+                    'locked_by' => $table->locked_by,
+                ];
+            });
+            
             return response()->json($tables, 200);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'An error occurred while fetching tables.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function lockTable($id, Request $request)
+    {
+        try {
+            $table = Table::findOrFail($id);
+
+            if (!$table->is_available) {
+                return response()->json([
+                    'message' => 'Table is already in use.',
+                ], 409);
+            }
+
+            $table->is_available = false;
+            $table->locked_by = $request->user()->id;
+            $table->save();
+
+            return response()->json([
+                'message' => 'Table successfully locked.',
+                'data' => $table,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to lock the table.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function unlockTable($id, Request $request)
+    {
+        try {
+            $table = Table::findOrFail($id);
+
+            if ($table->is_available) {
+                return response()->json([
+                    'message' => 'Table is already available.',
+                ], 409);
+            }
+
+            if ($table->locked_by !== $request->user()->id) {
+                return response()->json([
+                    'message' => 'You do not have permission to unlock this table.',
+                ], 403);
+            }
+
+            $table->is_available = true;
+            $table->locked_by = null;
+            $table->save();
+
+            return response()->json([
+                'message' => 'Table successfully unlocked.',
+                'data' => $table,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to unlock the table.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $table = Table::find($id);
+
+            if (!$table) {
+                return response()->json([
+                    'message' => 'Table not found, nothing to delete.',
+                ], 204);
+            }
+
+            $table->delete();
+
+            return response()->json([
+                'message' => 'Table deleted successfully.',
+            ], 204);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while deleting the table.',
                 'error' => $e->getMessage(),
             ], 500);
         }

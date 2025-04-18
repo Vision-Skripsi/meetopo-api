@@ -20,6 +20,7 @@ class UserDetails extends Model
         'user_id',
         'phone',
         'address',
+        'id_card',
         'photo',
     ];
 

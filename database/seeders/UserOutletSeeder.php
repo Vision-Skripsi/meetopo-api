@@ -18,7 +18,7 @@ class UserOutletSeeder extends Seeder
      */
     public function run(): void
     {
-        $users = User::where('role', 'cashier')->get();
+        $users = User::where('role', 'Pemilik')->get();
         foreach($users as $user){
             Outlet::create([
                 'name' => fake()->name . ' - Outlet',
