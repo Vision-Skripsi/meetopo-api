@@ -17,8 +17,7 @@ return new class extends Migration
                 $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             else if (config('database.default') == 'mysql')
                 $table->uuid('id')->primary()->default(DB::raw('uuid()'));
-
-            $table->uuid('transaction_id');
+            $table->foreignUuid('transaction_id')->constrained('transactions'); 
             $table->uuid('menu_id');
             $table->string('menu_name');
             $table->decimal('price', 10, 2);

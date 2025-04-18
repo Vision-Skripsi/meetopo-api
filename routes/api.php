@@ -33,7 +33,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::post('/outlets/assign-cashier/{outlet_id}', [OutletController::class, 'assignCashier']);
     });
 
-    Route::middleware('userAccess:Pemilik, Kasir')->group(function () {
+    Route::middleware('userAccess:Pemilik|Kasir')->group(function () {
         Route::get('/outlets', [OutletController::class, 'index']);
     });
 
@@ -50,7 +50,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::get('/transactions/{outlet_id}', [TransactionController::class, 'getTransactionsByOutletId']);
     });
     
-    Route::middleware('userAccess:Pemilik,Kasir')->group(function () {
+    Route::middleware('userAccess:Pemilik|Kasir')->group(function () {
         Route::post('/transactions/bulk-insert', [TransactionController::class, 'bulkInsert']);
     });
 
@@ -60,7 +60,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::delete('/tables/{id}', [TablesController::class, 'destroy']);
     });
 
-    Route::middleware('userAccess:Pemilik,Kasir')->group(function () {
+    Route::middleware('userAccess:Pemilik|Kasir')->group(function () {
         Route::get('/tables/{outlet_id}', [TablesController::class, 'getTablesByOutletId']);
         Route::post('/tables/lock/{id}', [TablesController::class, 'lockTable']);
         Route::post('/tables/unlock/{id}', [TablesController::class, 'unlockTable']);

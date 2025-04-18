@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             else if(config('database.default') == 'mysql')
                 $table->uuid('id')->primary()->default(DB::raw('uuid()'));
-            $table->uuid('outlet_id');
+            $table->foreignUuid('outlet_id')->constrained('outlets'); 
             $table->string('number');
             $table->boolean('is_available')->default(true);
             $table->timestamps();

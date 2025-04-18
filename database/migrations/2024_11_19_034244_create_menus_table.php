@@ -17,11 +17,11 @@ return new class extends Migration
                 $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             else if(config('database.default') == 'mysql')
                 $table->uuid('id')->primary()->default(DB::raw('uuid()'));
-            $table->uuid('outlet_id');
+            $table->foreignUuid('outlet_id')->constrained('outlets'); 
             $table->string('name');
-            $table->string('image')->nullable();
-            $table->string('price');
+            $table->decimal('price', 10, 2);
             $table->enum('category', ['Appetizer', 'Dessert', 'Drinks', 'Food', 'Vegetarian'])->default('Food');
+            $table->string('image');
             $table->timestamps();
             $table->softDeletes(); 
         });

@@ -18,13 +18,13 @@ return new class extends Migration
             else if(config('database.default') == 'mysql')
                 $table->uuid('id')->primary()->default(DB::raw('uuid()'));
             $table->foreignUuid('user_id')->constrained('users'); 
-            $table->string('name');
+            $table->string('name')->unique();;
             $table->string('address_one');
             $table->string('address_two')->nullable(); 
             $table->string('phone_one');
             $table->string('phone_two')->nullable();
-            $table->string('email')->nullable();
-            $table->string('photo')->nullable(); 
+            $table->string('email');
+            $table->string('photo'); 
             $table->timestamps();
             $table->softDeletes(); 
         });

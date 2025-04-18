@@ -17,10 +17,9 @@ return new class extends Migration
                 $table->uuid('id')->primary()->default(DB::raw('gen_random_uuid()'));
             else if (config('database.default') == 'mysql')
                 $table->uuid('id')->primary()->default(DB::raw('uuid()'));
-
-            $table->uuid('user_id');
-            $table->uuid('outlet_id');
-            $table->uuid('table_id');
+            $table->foreignUuid('user_id')->constrained('users'); 
+            $table->foreignUuid('outlet_id')->constrained('outlets'); 
+            $table->foreignUuid('table_id')->constrained('tables'); 
             $table->boolean('is_closed')->default(false);
             $table->timestamps();
             $table->softDeletes();
