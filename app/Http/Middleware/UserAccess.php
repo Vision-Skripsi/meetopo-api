@@ -14,11 +14,13 @@ class UserAccess
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $roles): Response
     {
         $user = Auth::user();
 
-        if (!$user || $user->role !== $role) {
+        $allowedRoles = explode('|', $roles);
+
+        if (!$user || !in_array($user->role, $allowedRoles)) {
             return response()->json(['error' => 'Forbidden: You do not have the required role.'], 403);
         }
 

@@ -32,13 +32,13 @@ class OutletController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:outlets',
             'address_one' => 'required|string|max:255',
             'address_two' => 'nullable|string|max:255',
             'phone_one' => 'required|string|max:20',
             'phone_two' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'email' => 'required|email|max:255|unique:outlets',
+            'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
         ]);

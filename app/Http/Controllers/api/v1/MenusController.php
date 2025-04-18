@@ -21,7 +21,7 @@ class MenusController extends Controller
             'menus.*.name' => 'required|string|max:255',
             'menus.*.price' => 'required|numeric',
             'menus.*.category' => 'required|in:Appetizer,Dessert,Drinks,Food,Vegetarian',
-            'menus.*.image' => 'nullable|string',
+            'menus.*.image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         try {
@@ -58,9 +58,9 @@ class MenusController extends Controller
                     ],
                     [
                         'name' => $menu['name'],
-                        'image' => $imageUrl,
                         'price' => $menu['price'],
                         'category' => $menu['category'],
+                        'image' => $imageUrl,
                         'updated_at' => now(),
                     ]
                 );
