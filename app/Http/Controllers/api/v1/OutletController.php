@@ -37,7 +37,7 @@ class OutletController extends Controller
             'address_two' => 'nullable|string|max:255',
             'phone_one' => 'required|string|max:20',
             'phone_two' => 'nullable|string|max:20',
-            'email' => 'required|email|max:255|unique:outlets',
+            'email' => 'required|email|max:255',
             'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
