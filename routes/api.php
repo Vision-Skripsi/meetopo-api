@@ -8,6 +8,13 @@ use App\Http\Controllers\api\v1\MenusController;
 use App\Http\Controllers\api\v1\TransactionController;
 use App\Http\Controllers\api\v1\TablesController;
 
+Route::get('/v1', function () {
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Welcome to Meetopo API!'
+    ]);
+});
+
 Route::prefix('v1')->group(function(){
     Route::get('auth/missing-token', [AuthenticationController::class, 'missingToken'])->name('login');
     Route::post('auth/user/registration', [AuthenticationController::class, 'registration']);
