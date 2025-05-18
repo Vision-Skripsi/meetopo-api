@@ -49,6 +49,15 @@ class MenusController extends Controller
                     /** @var \Illuminate\Filesystem\FilesystemAdapter $s3 */
                     $s3 = Storage::disk('s3');
                     $imageUrl = $s3->url($path);
+                } elseif ($existingMenu) {
+                    $imageUrl = $existingMenu->image;
+                }
+
+                if (!$imageUrl) {
+                    return response()->json([
+                        'message' => "Image is required for menu at index $index",
+                        'error' => "No image found for update",
+                    ], 422);
                 }
 
                 Menus::updateOrCreate(
