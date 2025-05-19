@@ -38,6 +38,8 @@ class OutletController extends Controller
             'phone_one' => 'required|string|max:20',
             'phone_two' => 'nullable|string|max:20',
             'email' => 'required|email|max:255',
+            'tax' => 'required|numeric',
+            'service_charge' => 'required|numeric',
             'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
@@ -90,6 +92,8 @@ class OutletController extends Controller
             'phone_one' => 'nullable|string|max:20',
             'phone_two' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',
+            'tax' => 'required|numeric',
+            'service_charge' => 'required|numeric',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
@@ -120,7 +124,7 @@ class OutletController extends Controller
         // Only update fields that are present in the request
         $outlet->fill($request->only([
             'name', 'address_one', 'address_two',
-            'phone_one', 'phone_two', 'email',
+            'phone_one', 'phone_two', 'email', 'tax', 'service_charge',
             'latitude', 'longitude'
         ]));
     

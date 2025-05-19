@@ -21,6 +21,8 @@ return new class extends Migration
             $table->foreignUuid('outlet_id')->constrained('outlets'); 
             $table->foreignUuid('table_id')->constrained('tables'); 
             $table->boolean('is_closed')->default(false);
+            $table->decimal('tax', 10, 2);
+            $table->decimal('service_charge', 10, 2);
             $table->timestamps();
             $table->softDeletes();
         });

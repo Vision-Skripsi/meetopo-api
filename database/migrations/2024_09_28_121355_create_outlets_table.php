@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('phone_one');
             $table->string('phone_two')->nullable();
             $table->string('email');
+            $table->decimal('tax', 10, 2);
+            $table->decimal('service_charge', 10, 2);
             $table->string('photo'); 
             $table->timestamps();
             $table->softDeletes(); 
