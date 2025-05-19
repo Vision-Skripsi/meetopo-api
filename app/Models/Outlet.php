@@ -22,6 +22,8 @@ class Outlet extends Model
         'phone_one',
         'phone_two',
         'email',
+        'tax',
+        'service_charge',
         'photo',
         'latitude',
         'longitude',
@@ -38,6 +40,8 @@ class Outlet extends Model
         'id' => 'string', // Ensure UUID is treated as a string
         'user_id' => 'string', // Ensure UUID is treated as a string
         'cashier_id' => 'string', // Ensure UUID is treated as a string
+        'tax' => 'float',
+        'service_charge' => 'float',
         'latitude' => 'float',
         'longitude' => 'float',
     ];

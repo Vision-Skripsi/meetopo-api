@@ -21,11 +21,15 @@ class Transaction extends Model
         'outlet_id',
         'table_id',
         'is_closed',
+        'tax',
+        'service_charge',
         'created_at'
     ];
 
     protected $casts = [
         'is_closed' => 'boolean',
+        'tax' => 'float',
+        'service_charge' => 'float',
     ];
 
     public function items()
