@@ -20,10 +20,13 @@ Route::prefix('v1')->group(function(){
     Route::post('auth/user/registration', [AuthenticationController::class, 'registration']);
     Route::post('auth/user/login', [AuthenticationController::class, 'login']);
     Route::get('/outlets-public', [OutletController::class, 'index']);
+    Route::post('auth/forgot-password', [AuthenticationController::class, 'sendResetLink']);
+    Route::post('auth/reset-password', [AuthenticationController::class, 'resetPassword'])->name('password.reset');
 });
 
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::get('auth/user', [AuthenticationController::class, 'getUserData']);
+    Route::post('auth/user/update-password', [AuthenticationController::class, 'updatePassword']);
     Route::get('user/details/{user_id}', [UserDetailsController::class, 'show']);
     Route::put('user/details/{user_id}', [UserDetailsController::class, 'update']);
 
