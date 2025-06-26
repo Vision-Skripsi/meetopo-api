@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\UserDetails;
+use Illuminate\Support\Facades\Password;
 
 class AuthenticationController extends Controller
 {
@@ -119,6 +120,51 @@ class AuthenticationController extends Controller
         return response()->json([
             'error' => 'You need token to verify and access protected API'
         ], 401);
+    }
+
+    public function sendResetLink(Request $request) {
+        $request->validate(['email' => 'required|email']);
+        $status = Password::sendResetLink($request->only('email'));
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => __($status)], 200)
+            : response()->json(['message' => __($status)], 400);
+    }
+
+    public function resetPassword(Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|string|confirmed|min:8',
+        ]);
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill(['password' => bcrypt($password)])->save();
+            }
+        );
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => __($status)], 200)
+            : response()->json(['message' => __($status)], 400);
+    }
+
+    public function updatePassword(Request $request) 
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|confirmed|min:8',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 400);
+        }
+
+        $user->password = Hash::make($request->new_password);
+        User::where('id', $user->id)->update(['password' => Hash::make($request->new_password)]);
+
+        return response()->json(['message' => 'Password updated successfully'], 200);
     }
 
     public function getCashiers(Request $request)
